@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${pageTitle}">食事入力</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .wrap{max-width:900px;margin:24px auto;padding:0 12px;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .card{border:1px solid #eee;border-radius:12px;padding:12px;}
+    .row{display:flex;align-items:center;gap:8px;margin:6px 0;}
+    .bar{flex:1;height:10px;background:#eee;border-radius:6px;overflow:hidden}
+    .bar>div{height:100%;}
+    .muted{color:#666;font-size:0.9rem}
+    .val{font-weight:bold;font-size:1.1rem}
+    .unit{margin-left:4px;color:#666}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid #eee;padding:8px;text-align:left}
+    .actions{margin-top:10px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h2>食事入力</h2>
+
+  <!-- 入力フォーム -->
+  <div class="card">
+    <form th:action="@{/diet/meal}" method="post" th:object="${mealForm}">
+      <label>食品</label>
+      <select th:field="*{foodName}">
+        <option th:each="f : ${foods}" th:value="${f}" th:text="${f}">ご飯(白米)</option>
+      </select>
+      &nbsp;&nbsp;
+      <label>量(g)</label>
+      <input type="number" min="1" step="1" th:field="*{grams}">
+      <button type="submit">追加</button>
+    </form>
+  </div>
+
+  <!-- 今日の一覧 -->
+  <h3 style="margin-top:16px;">今日の食事</h3>
+  <div class="card" th:if="${#lists.isEmpty(meals)}">
+    まだ登録がありません。
+  </div>
+  <div class="card" th:if="${!#lists.isEmpty(meals)}">
+    <table>
+      <thead>
+        <tr>
+          <th>食品</th><th>量(g)</th><th>kcal</th><th>たんぱく</th><th>炭水化物</th><th>脂質</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="m : ${meals}">
+          <td th:text="${m.foodName}">ご飯</td>
+          <td th:text="${m.grams}">100</td>
+          <td th:text="${m.energyKcal}">168</td>
+          <td th:text="${m.proteinG}">3.0</td>
+          <td th:text="${m.carbG}">30.0</td>
+          <td th:text="${m.fatG}">1.0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 合計 & 進捗 -->
+  <h3 style="margin-top:16px;">今日の合計と進捗</h3>
+  <div class="card"
+       th:with="
+         ek=${target.energyKcal}?:0,
+         pg=${target.proteinG}?:0,
+         km=${target.potassiumMg}?:0,
+         pm=${target.phosphorusMg}?:0,
+         na=${target.sodiumG}?:0,
+         tk=${totals.energyKcal}?:0,
+         tp=${totals.proteinG}?:0,
+         tkm=${totals.potassiumMg}?:0,
+         tpm=${totals.phosphorusMg}?:0,
+         tna=${totals.sodiumG}?:0">
+
+    <div class="row">
+      <div class="muted">エネルギー</div>
+      <div class="bar"><div th:style="${ek>0 ? 'width:' + (tk*100.0/ek) + '%' : 'width:0%'}"></div></div>
+      <div class="muted"><span class="val" th:text="${tk}">0</span> / <span th:text="${ek}">0</span> kcal</div>
+    </div>
+
+    <div class="row">
+      <div class="muted">たんぱく質</div>
+      <div class="bar"><div th:style="${pg>0 ? 'width:' + (tp*100.0/pg) + '%' : 'width:0%'}"></div></div>
+      <div class="muted"><span class="val" th:text="${tp}">0.0</span> / <span th:text="${pg}">0.0</span> g</div>
+    </div>
+
+    <div class="row">
+      <div class="muted">カリウム</div>
+      <div class="bar"><div th:style="${km>0 ? 'width:' + (tkm*100.0/km) + '%' : 'width:0%'}"></div></div>
+      <div class="muted"><span class="val" th:text="${tkm}">0</span> / <span th:text="${km}">0</span> mg</div>
+    </div>
+
+    <div class="row">
+      <div class="muted">リン</div>
+      <div class="bar"><div th:style="${pm>0 ? 'width:' + (tpm*100.0/pm) + '%' : 'width:0%'}"></div></div>
+      <div class="muted"><span class="val" th:text="${tpm}">0</span> / <span th:text="${pm}">0</span> mg</div>
+    </div>
+
+    <div class="row">
+      <div class="muted">食塩相当量</div>
+      <div class="bar"><div th:style="${na>0 ? 'width:' + (tna*100.0/na) + '%' : 'width:0%'}"></div></div>
+      <div class="muted"><span class="val" th:text="${tna}">0</span> / <span th:text="${na}">0</span> g</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <a th:href="@{/diet/dashboard}">← ダッシュボードへ戻る</a>
+  </div>
+</div>
+</body>
+</html>
