@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>制限食モード選択</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+  <h2>制限食モードを選択してください</h2>
+
+  <form th:action="@{/diet/lowCarb}" method="post">
+    <input type="hidden" th:if="${_csrf != null}"
+           th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <button type="submit">糖尿病食（Low Carb）</button>
+  </form>
+
+  <form th:action="@{/diet/lowProtein}" method="post">
+    <input type="hidden" th:if="${_csrf != null}"
+           th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <button type="submit">低たんぱく食（Low Protein）</button>
+  </form>
+</body>
+</html>

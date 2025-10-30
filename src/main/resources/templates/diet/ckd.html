@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${pageTitle}">低たんぱく食モード</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h2 th:text="${pageTitle}">低たんぱく食ダッシュボード</h2>
+    <a th:href="@{/diet/profile}">プロファイル編集</a>
+  </div>
+
+  <!-- 目標カード群 -->
+  <section th:if="${target != null}">
+    <div class="grid">
+      <div class="card">
+        <h4>総エネルギー</h4>
+        <span class="val" th:text="${target.energyKcal}">1800</span><span class="unit">kcal</span>
+        <div class="warn">※ 低Pでもエネルギーはしっかり確保</div>
+      </div>
+      <div class="card">
+        <h4>たんぱく質（上限）</h4>
+        <span class="val" th:text="${target.proteinG}">40</span><span class="unit">g/日</span>
+      </div>
+      <div class="card">
+        <h4>炭水化物</h4>
+        <span class="val" th:text="${target.carbG}">260</span><span class="unit">g</span>
+      </div>
+      <div class="card">
+        <h4>脂質</h4>
+        <span class="val" th:text="${target.fatG}">55</span><span class="unit">g</span>
+      </div>
+      <div class="card">
+        <h4>食塩相当量</h4>
+        <span class="val" th:text="${target.sodiumG}">6</span><span class="unit">g</span>
+      </div>
+      <div class="card">
+        <h4>カリウム</h4>
+        <span class="val" th:text="${target.potassiumMg}">2000</span><span class="unit">mg</span>
+      </div>
+      <div class="card">
+        <h4>リン</h4>
+        <span class="val" th:text="${target.phosphorusMg}">800</span><span class="unit">mg</span>
+      </div>
+    </div>
+
+    <!-- 進捗（今は実績=0の仮表示。後でMeal集計に差し替え） -->
+    <h3 style="margin-top:20px;">今日の進捗</h3>
+    <div class="card"
+        th:with="
+          ek=${target.energyKcal}?:0,
+          pg=${target.proteinG}?:0,
+          km=${target.potassiumMg}?:0,
+          pm=${target.phosphorusMg}?:0,
+          na=${target.sodiumG}?:0,
+          c0=${0.0}">
+
+      <div class="row">
+        <div class="muted">エネルギー</div>
+        <div class="bar">
+          <div th:style="${ek > 0 ? 'width:' + (c0 / ek * 100) + '%' : 'width:0%'}"></div>
+        </div>
+        <div class="muted">0 / <span th:text="${ek}">1800</span> kcal</div>
+      </div>
+
+      <div class="row">
+        <div class="muted">たんぱく質（上限）</div>
+        <div class="bar">
+          <div th:style="${pg > 0 ? 'width:' + (c0 / pg * 100) + '%' : 'width:0%'}"></div>
+        </div>
+        <div class="muted">0 / <span th:text="${pg}">40</span> g</div>
+      </div>
+
+      <div class="row">
+        <div class="muted">カリウム</div>
+        <div class="bar">
+          <div th:style="${km > 0 ? 'width:' + (c0 / km * 100) + '%' : 'width:0%'}"></div>
+        </div>
+        <div class="muted">0 / <span th:text="${km}">2000</span> mg</div>
+      </div>
+
+      <div class="row">
+        <div class="muted">リン</div>
+        <div class="bar">
+          <div th:style="${pm > 0 ? 'width:' + (c0 / pm * 100) + '%' : 'width:0%'}"></div>
+        </div>
+        <div class="muted">0 / <span th:text="${pm}">800</span> mg</div>
+      </div>
+
+      <div class="row">
+        <div class="muted">食塩相当量</div>
+        <div class="bar">
+          <div th:style="${na > 0 ? 'width:' + (c0 / na * 100) + '%' : 'width:0%'}"></div>
+        </div>
+        <div class="muted">0 / <span th:text="${na}">6</span> g</div>
+      </div>
+    </div>
+
+  </section>
+
+  <p th:if="${target == null}" style="color:#c00;">
+    目標がまだ計算されていません。<a th:href="@{/diet/profile}">プロファイルを入力</a>してください。
+  </p>
+
+  <p style="margin-top:16px;"><a th:href="@{/diet/select}">← モード選択に戻る</a></p>
+</div>
+</body>
+</html>

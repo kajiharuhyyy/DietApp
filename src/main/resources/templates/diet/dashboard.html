@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${pageTitle}">ダッシュボード</title>
+  <link rel="stylesheet" th:href="@{/css/mt-style.css}">
+</head>
+<body>
+  <h2 th:text="${pageTitle}">ダッシュボード</h2>
+
+  <section th:if="${target != null}">
+    <h3>今日の目標</h3>
+    <ul>
+      <li>総エネルギー: <span th:text="${target.energyKcal}">2000</span> kcal</li>
+      <li>炭水化物: <span th:text="${target.carbG}">250</span> g</li>
+      <li>たんぱく質: <span th:text="${target.proteinG}">60</span> g</li>
+      <li>脂質: <span th:text="${target.fatG}">55</span> g</li>
+      <li>食物繊維: <span th:text="${target.fiberG}">21</span> g</li>
+      <li>食塩相当量: <span th:text="${target.sodiumG}">6</span> g</li>
+    </ul>
+  </section>
+
+  <p><a th:href="@{/diet/profile}">プロファイルを編集して再計算</a></p>
+  <p><a th:href="@{/diet/select}">モード選択へ戻る</a></p>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${pageTitle}">糖尿病食モード</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h2 th:text="${pageTitle}">糖尿病食ダッシュボード</h2>
+    <a th:href="@{/diet/profile}">プロファイル編集</a>
+  </div>
+
+  <!-- 目標カード群 -->
+  <section th:if="${target != null}">
+    <div class="grid">
+      <div class="card">
+        <h4>総エネルギー</h4>
+        <span class="val" th:text="${target.energyKcal}">2000</span><span class="unit">kcal</span>
+      </div>
+      <div class="card">
+        <h4>炭水化物</h4>
+        <span class="val" th:text="${target.carbG}">250</span><span class="unit">g</span>
+      </div>
+      <div class="card">
+        <h4>たんぱく質</h4>
+        <span class="val" th:text="${target.proteinG}">60</span><span class="unit">g</span>
+      </div>
+      <div class="card">
+        <h4>脂質</h4>
+        <span class="val" th:text="${target.fatG}">55</span><span class="unit">g</span>
+      </div>
+      <div class="card">
+        <h4>食物繊維</h4>
+        <span class="val" th:text="${target.fiberG}">21</span><span class="unit">g</span>
+      </div>
+      <div class="card">
+        <h4>食塩相当量</h4>
+        <span class="val" th:text="${target.sodiumG}">6</span><span class="unit">g</span>
+      </div>
+    </div>
+
+    <!-- 進捗バー（今は実績=0として表示。あとで食事入力と連動） -->
+    <h3 style="margin-top:20px;">今日の進捗</h3>
+    <div class="card">
+      <div class="row">
+        <div class="muted">エネルギー</div>
+        <div class="bar"><div th:style="'width:' + (0 / ${target.energyKcal} * 100) + '%'"></div></div>
+        <div class="muted">0 / <span th:text="${target.energyKcal}">2000</span> kcal</div>
+      </div>
+      <div class="row">
+        <div class="muted">炭水化物</div>
+        <div class="bar"><div th:style="'width:' + (0 / ${target.carbG} * 100) + '%'"></div></div>
+        <div class="muted">0 / <span th:text="${target.carbG}">250</span> g</div>
+      </div>
+      <div class="row">
+        <div class="muted">たんぱく質</div>
+        <div class="bar"><div th:style="'width:' + (0 / ${target.proteinG} * 100) + '%'"></div></div>
+        <div class="muted">0 / <span th:text="${target.proteinG}">60</span> g</div>
+      </div>
+      <div class="row">
+        <div class="muted">脂質</div>
+        <div class="bar"><div th:style="'width:' + (0 / ${target.fatG} * 100) + '%'"></div></div>
+        <div class="muted">0 / <span th:text="${target.fatG}">55</span> g</div>
+      </div>
+    </div>
+  </section>
+
+  <p th:if="${target == null}" style="color:#c00;">
+    目標がまだ計算されていません。<a th:href="@{/diet/profile}">プロファイルを入力</a>してください。
+  </p>
+
+  <p style="margin-top:16px;"><a th:href="@{/diet/select}">← モード選択に戻る</a></p>
+</div>
+</body>
+</html>
