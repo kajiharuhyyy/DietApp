@@ -89,7 +89,17 @@ public class MealController {
 
                 ra.addFlashAttribute("msg", "食事を削除しました。");
                 return "redirect:/diet/meal";
-            }
+    }
+
+    @GetMapping("/diet/meal")
+    public String mealList(@SessionAttribute(value = "profileId", required = false) Long profileId, Model model) {
+        if (profileId == null) return "redirect:/diet/select";
+        var today = java.time.LocalDate.now();
+        var meals = mealRepo.findByProfileIdAndEatDateOrderByIdAsc(profileId, today);
+        model.addAttribute("meals", meals);
+
+        return "diet/meal";
+    }
 
     public static class MealForm {
         private String foodName;
