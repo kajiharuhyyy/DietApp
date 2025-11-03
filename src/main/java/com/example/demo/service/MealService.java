@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.demo.domain.Food;
 import com.example.demo.domain.Meal;
 import com.example.demo.domain.Profile;
+import com.example.demo.repo.FoodRepository;
 import com.example.demo.repo.MealRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,34 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class MealService {
+
     private final MealRepository mealRepo;
+    private final FoodRepository foodRepo;
+
+    public void addMealByFoodId(Profile p, LocalDate date, Long foodId, int grams) {
+        Food f = foodRepo.findById(foodId)
+                .orElseThrow(() -> new IllegalArgumentException("food not found: " + foodId));
+
+        double ratio = grams / 100.0;
+
+        Meal m = new Meal();
+        m.setProfile(p);
+        m.setEatDate(date);
+        m.setFoodName(f.getName());
+        m.setGrams(grams);
+
+        m.setEnergyKcal((int) Math.round(f.getEnergyKcalPer100g() * ratio));
+        m.setProteinG(round1(f.getProteinGPer100g() * ratio));
+        m.setFatG(round1(f.getFatGPer100g() * ratio));
+        m.setCarbG(round1(f.getCarbGPer100g() * ratio));
+        m.setFiberG(round1(f.getFiberGPer100g() * ratio));
+        m.setSodiumG(round2(f.getSodiumGPer100g() * ratio)); 
+        m.setPotassiumMg(round0(f.getPotassiumMgPer100g() * ratio));
+        m.setPhosphorusMg(round0(f.getPhosphorusMgPer100g() * ratio));
+
+        mealRepo.save(m);
+
+    }
 
     public Meal addMeal(Profile profile, LocalDate date, String foodName, int grams) {
         var base = FoodCatalog.ITEMS.get(foodName);
@@ -60,14 +89,16 @@ public class MealService {
 
     public static class Totals {
         public int energyKcal = 0;
-        public double proteinG = 0, carbG = 0, fatG = 0, sodiumG = 0, potassiumMg = 0, phosphorusMg = 0, fiberG = 0;
+        public double proteinG = 0, carbG = 0, fatG = 0, sodiumG = 0, fiberG = 0;
+        public double potassiumMg = 0, phosphorusMg = 0;
+
         void round() {
             proteinG = round1(proteinG);
             carbG = round1(carbG);
             fatG = round1(fatG);
             sodiumG = round2(sodiumG);
-            potassiumMg = round1(potassiumMg);
-            phosphorusMg = round1(phosphorusMg);
+            potassiumMg = Math.round(potassiumMg);
+            phosphorusMg = Math.round(phosphorusMg);
             fiberG = round1(fiberG);
         }
     }
@@ -81,7 +112,10 @@ public class MealService {
     private static double round1(double v) {
         return Math.round(v * 10.0)/10.0;
     }
-        private static double round2(double v) {
-        return Math.round(v * 10.0)/10.0;
+    private static double round2(double v) {
+        return Math.round(v * 100.0)/100.0;
+    }
+    private static double round0(double v) {
+        return (int)Math.round(v);
     }
 }

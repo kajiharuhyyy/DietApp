@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.demo.domain.DailyTarget;
 import com.example.demo.domain.Meal;
 import com.example.demo.domain.Profile;
+import com.example.demo.repo.FoodRepository;
 import com.example.demo.repo.MealRepository;
 import com.example.demo.repo.ProfileRepository;
 import com.example.demo.service.FoodCatalog;
@@ -36,6 +37,7 @@ public class MealController {
     private final MealService mealService;
     private final TargetCalculator targetCalculator;
     private final MealRepository mealRepo;
+    private final FoodRepository foodRepo;
 
     @ModelAttribute("mealForm")
     public MealForm mealForm() {
@@ -54,7 +56,7 @@ public class MealController {
         Totals totals = mealService.sum(meals);
         DailyTarget target = targetCalculator.calculateAndPersist(p, today);
 
-        model.addAttribute("foods", FoodCatalog.ITEMS.keySet());
+        model.addAttribute("foods", foodRepo.findTop50ByNameContainingIgnoreCaseOrderByNameAsc(""));
         model.addAttribute("meals", meals);
         model.addAttribute("totals", totals);
         model.addAttribute("target", target);
@@ -71,7 +73,7 @@ public class MealController {
         Profile p = profileRepo.findById(profileId).orElse(null);
         if (p == null) return "redirect:/diet/select";
 
-        mealService.addMeal(p, LocalDate.now(), form.getFoodName(), form.getGrams());
+        mealService.addMealByFoodId(p, LocalDate.now(), form.getFoodId(), form.getGrams());
         return "redirect:/diet/meal";
     }
 
@@ -91,32 +93,13 @@ public class MealController {
         return "redirect:/diet/meal";
     }
 
-
-    @GetMapping("/diet/meal")
-    public String mealList(@SessionAttribute(value = "profileId", required = false) Long profileId, Model model) {
-        if (profileId == null) return "redirect:/diet/select";
-        var today = java.time.LocalDate.now();
-        var meals = mealRepo.findByProfileIdAndEatDateOrderByIdAsc(profileId, today);
-        model.addAttribute("meals", meals);
-
-        return "diet/meal";
-    }
-
     public static class MealForm {
-        private String foodName;
+        private Long foodId;
         private int grams = 100;
 
-        public String getFoodName() {
-            return foodName;
-        }
-        public void setFoodName(String s) {
-            this.foodName = s;
-        }
-        public int getGrams() {
-            return grams;
-        }
-        public void setGrams(int g) {
-            this.grams = g;
-        }
+public Long getFoodId() { return foodId; }
+        public void setFoodId(Long id) { this.foodId = id; }
+        public int getGrams() { return grams; }
+        public void setGrams(int g) { this.grams = g; }
     }
 }

@@ -27,19 +27,23 @@
   <p class="msg" th:if="${msg != null}" th:text="${msg}"></p>
 
   <!-- 追加フォーム -->
-  <form th:action="@{/diet/meal}" method="post" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-    <label>
-      食品
-      <select name="foodName">
-        <option th:each="name : ${foods}" th:value="${name}" th:text="${name}">食品名</option>
-      </select>
-    </label>
-    <label>
-      量(g)
-      <input type="number" name="grams" min="1" step="1" th:value="${mealForm.grams}">
-    </label>
-    <button type="submit" class="btn">追加</button>
-  </form>
+    <form th:action="@{/diet/meal}" method="post" th:object="${mealForm}">
+    <label>食品</label>
+    <select th:field="*{foodId}">
+        <option th:each="f : ${foods}" th:value="${f.id}" th:text="${f.name}"></option>
+    </select>
+
+    <label>量(g)</label>
+    <input type="number" th:field="*{grams}" min="1" step="1"/>
+
+    <button type="submit">追加</button>
+    </form>
+
+<!-- 削除ボタン（行ごと） -->
+    <form th:action="@{'/diet/meal/' + ${m.id} + '/delete'}" method="post">
+    <button type="submit" class="danger">削除</button>
+    </form>
+
 
   <!-- 今日の目標と進捗 -->
   <section th:if="${target != null}">
@@ -65,10 +69,6 @@
         <td class="right" th:text="${m.fatG}">0.3</td>
         <td class="right" th:text="${m.carbG}">37</td>
         <td class="right">
-          <form th:action="@{'/diet/meal/' + ${m.id} + '/delete'}" method="post" style="display:inline">
-            <button type="submit" class="btn-danger">削除</button>
-          </form>
-        </td>
       </tr>
       <tr th:if="${#lists.isEmpty(meals)}">
         <td colspan="7" class="muted">まだ登録がありません。</td>
@@ -77,7 +77,7 @@
   </table>
 
     <h3 style="margin-top:16px;">今日の進捗</h3>
-
+  <!-- 食事一覧 -->
     <div class="row">
       <div class="muted">エネルギー</div>
       <div class="bar">
@@ -123,7 +123,7 @@
     </div>
   </section>
 
-  <!-- 食事一覧 -->
+
   
 
   <p style="margin-top:16px;"><a th:href="@{/diet/select}">← モード選択に戻る</a></p>
