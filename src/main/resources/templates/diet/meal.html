@@ -5,117 +5,128 @@
   <title th:text="${pageTitle}">食事入力</title>
   <link rel="stylesheet" th:href="@{/css/style.css}">
   <style>
-    .wrap{max-width:900px;margin:24px auto;padding:0 12px;}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    .card{border:1px solid #eee;border-radius:12px;padding:12px;}
-    .row{display:flex;align-items:center;gap:8px;margin:6px 0;}
-    .bar{flex:1;height:10px;background:#eee;border-radius:6px;overflow:hidden}
-    .bar>div{height:100%;}
-    .muted{color:#666;font-size:0.9rem}
-    .val{font-weight:bold;font-size:1.1rem}
-    .unit{margin-left:4px;color:#666}
-    table{width:100%;border-collapse:collapse}
-    th,td{border-bottom:1px solid #eee;padding:8px;text-align:left}
-    .actions{margin-top:10px}
+    .wrap{max-width:920px;margin:24px auto;padding:0 12px}
+    .row{display:flex;align-items:center;gap:12px;margin:6px 0}
+    .bar{flex:1;height:10px;background:#eee;border-radius:4px;overflow:hidden}
+    .bar>div{height:100%}
+    table{width:100%;border-collapse:collapse;margin-top:16px}
+    th,td{border-bottom:1px solid #ddd;padding:8px}
+    .right{text-align:right}
+    .muted{color:#666}
+    .msg{color:#0a7}
+    .btn-danger{background:#c33;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer}
+    .btn{padding:6px 12px;border-radius:4px;border:1px solid #ccc;background:#fafafa;cursor:pointer}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h2>食事入力</h2>
 
-  <!-- 入力フォーム -->
-  <div class="card">
-    <form th:action="@{/diet/meal}" method="post" th:object="${mealForm}">
-      <label>食品</label>
-      <select th:field="*{foodName}">
-        <option th:each="f : ${foods}" th:value="${f}" th:text="${f}">ご飯(白米)</option>
+  <h2 th:text="${pageTitle}">食事入力</h2>
+
+  <!-- フラッシュメッセージ -->
+  <p class="msg" th:if="${msg != null}" th:text="${msg}"></p>
+
+  <!-- 追加フォーム -->
+  <form th:action="@{/diet/meal}" method="post" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+    <label>
+      食品
+      <select name="foodName">
+        <option th:each="name : ${foods}" th:value="${name}" th:text="${name}">食品名</option>
       </select>
-      &nbsp;&nbsp;
-      <label>量(g)</label>
-      <input type="number" min="1" step="1" th:field="*{grams}">
-      <button type="submit">追加</button>
-    </form>
-  </div>
+    </label>
+    <label>
+      量(g)
+      <input type="number" name="grams" min="1" step="1" th:value="${mealForm.grams}">
+    </label>
+    <button type="submit" class="btn">追加</button>
+  </form>
 
-  <!-- 今日の一覧 -->
-  <h3 style="margin-top:16px;">今日の食事</h3>
-  <div class="card" th:if="${#lists.isEmpty(meals)}">
-    まだ登録がありません。
-  </div>
-  <div class="card" th:if="${!#lists.isEmpty(meals)}">
-    <table>
-      <thead>
-        <tr>
-          <th>食品</th><th>量(g)</th><th>kcal</th><th>たんぱく</th><th>炭水化物</th><th>脂質</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="m : ${meals}">
-          <td th:text="${m.foodName}">ご飯</td>
-          <td th:text="${m.grams}">100</td>
-          <td th:text="${m.energyKcal}">168</td>
-          <td th:text="${m.proteinG}">3.0</td>
-          <td th:text="${m.carbG}">30.0</td>
-          <td th:text="${m.fatG}">1.0</td>
-          <td>
-            <form th:action="@{'/diet/meal/' + ${meal.id} + '/delete'}" method="post" style="display:inline">
-                <button type="submit" class="btn btn-danger">削除</button>
-            </form>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- 今日の目標と進捗 -->
+  <section th:if="${target != null}">
+    <h3 style="margin-top:24px;">今日の食事</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>食品</th>
+        <th class="right">量(g)</th>
+        <th class="right">kcal</th>
+        <th class="right">P(g)</th>
+        <th class="right">F(g)</th>
+        <th class="right">C(g)</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="m : ${meals}">
+        <td th:text="${m.foodName}">ごはん</td>
+        <td class="right" th:text="${m.grams}">100</td>
+        <td class="right" th:text="${m.energyKcal}">168</td>
+        <td class="right" th:text="${m.proteinG}">3.0</td>
+        <td class="right" th:text="${m.fatG}">0.3</td>
+        <td class="right" th:text="${m.carbG}">37</td>
+        <td class="right">
+          <form th:action="@{'/diet/meal/' + ${m.id} + '/delete'}" method="post" style="display:inline">
+            <button type="submit" class="btn-danger">削除</button>
+          </form>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(meals)}">
+        <td colspan="7" class="muted">まだ登録がありません。</td>
+      </tr>
+    </tbody>
+  </table>
 
-  <!-- 合計 & 進捗 -->
-  <h3 style="margin-top:16px;">今日の合計と進捗</h3>
-  <div class="card"
-       th:with="
-         ek=${target.energyKcal}?:0,
-         pg=${target.proteinG}?:0,
-         km=${target.potassiumMg}?:0,
-         pm=${target.phosphorusMg}?:0,
-         na=${target.sodiumG}?:0,
-         tk=${totals.energyKcal}?:0,
-         tp=${totals.proteinG}?:0,
-         tkm=${totals.potassiumMg}?:0,
-         tpm=${totals.phosphorusMg}?:0,
-         tna=${totals.sodiumG}?:0">
+    <h3 style="margin-top:16px;">今日の進捗</h3>
 
     <div class="row">
       <div class="muted">エネルギー</div>
-      <div class="bar"><div th:style="${ek>0 ? 'width:' + (tk*100.0/ek) + '%' : 'width:0%'}"></div></div>
-      <div class="muted"><span class="val" th:text="${tk}">0</span> / <span th:text="${ek}">0</span> kcal</div>
+      <div class="bar">
+        <div th:style="|width:${(target.energyKcal != null and target.energyKcal > 0) ? (totals.energyKcal * 100 / target.energyKcal) : 0}%|"></div>
+      </div>
+      <div class="muted">
+        <span th:text="${totals.energyKcal}">0</span> /
+        <span th:text="${target.energyKcal}">1800</span> kcal
+      </div>
     </div>
 
     <div class="row">
       <div class="muted">たんぱく質</div>
-      <div class="bar"><div th:style="${pg>0 ? 'width:' + (tp*100.0/pg) + '%' : 'width:0%'}"></div></div>
-      <div class="muted"><span class="val" th:text="${tp}">0.0</span> / <span th:text="${pg}">0.0</span> g</div>
+      <div class="bar">
+        <div th:style="|width:${(target.proteinG != null and target.proteinG > 0) ? (totals.proteinG * 100 / target.proteinG) : 0}%|"></div>
+      </div>
+      <div class="muted">
+        <span th:text="${totals.proteinG}">0</span> /
+        <span th:text="${target.proteinG}">60</span> g
+      </div>
     </div>
 
     <div class="row">
-      <div class="muted">カリウム</div>
-      <div class="bar"><div th:style="${km>0 ? 'width:' + (tkm*100.0/km) + '%' : 'width:0%'}"></div></div>
-      <div class="muted"><span class="val" th:text="${tkm}">0</span> / <span th:text="${km}">0</span> mg</div>
+      <div class="muted">炭水化物</div>
+      <div class="bar">
+        <div th:style="|width:${(target.carbG != null and target.carbG > 0) ? (totals.carbG * 100 / target.carbG) : 0}%|"></div>
+      </div>
+      <div class="muted">
+        <span th:text="${totals.carbG}">0</span> /
+        <span th:text="${target.carbG}">260</span> g
+      </div>
     </div>
 
     <div class="row">
-      <div class="muted">リン</div>
-      <div class="bar"><div th:style="${pm>0 ? 'width:' + (tpm*100.0/pm) + '%' : 'width:0%'}"></div></div>
-      <div class="muted"><span class="val" th:text="${tpm}">0</span> / <span th:text="${pm}">0</span> mg</div>
+      <div class="muted">脂質</div>
+      <div class="bar">
+        <div th:style="|width:${(target.fatG != null and target.fatG > 0) ? (totals.fatG * 100 / target.fatG) : 0}%|"></div>
+      </div>
+      <div class="muted">
+        <span th:text="${totals.fatG}">0</span> /
+        <span th:text="${target.fatG}">50</span> g
+      </div>
     </div>
+  </section>
 
-    <div class="row">
-      <div class="muted">食塩相当量</div>
-      <div class="bar"><div th:style="${na>0 ? 'width:' + (tna*100.0/na) + '%' : 'width:0%'}"></div></div>
-      <div class="muted"><span class="val" th:text="${tna}">0</span> / <span th:text="${na}">0</span> g</div>
-    </div>
-  </div>
+  <!-- 食事一覧 -->
+  
 
-  <div class="actions">
-    <a th:href="@{/diet/dashboard}">← ダッシュボードへ戻る</a>
-  </div>
+  <p style="margin-top:16px;"><a th:href="@{/diet/select}">← モード選択に戻る</a></p>
 </div>
 </body>
 </html>

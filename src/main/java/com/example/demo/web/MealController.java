@@ -44,52 +44,53 @@ public class MealController {
 
     @GetMapping
     public String show(@SessionAttribute(value = "profileId", required = false) Long profileId, Model model) {
-        if (profileId == null) return "redirect:/diet/selest";
+        if (profileId == null) return "redirect:/diet/select";
 
-                Profile p = profileRepo.findById(profileId).orElse(null);
-                if (p == null) return "redirect:/diet/select";
+        Profile p = profileRepo.findById(profileId).orElse(null);
+        if (p == null) return "redirect:/diet/select";
 
-                LocalDate today = LocalDate.now();
-                List<Meal> meals = mealService.listToday(profileId, today);
-                Totals totals = mealService.sum(meals);
-                DailyTarget target = targetCalculator.calculateAndPersist(p, today);
+        LocalDate today = LocalDate.now();
+        List<Meal> meals = mealService.listToday(profileId, today);
+        Totals totals = mealService.sum(meals);
+        DailyTarget target = targetCalculator.calculateAndPersist(p, today);
 
-                model.addAttribute("foods", FoodCatalog.ITEMS.keySet()); // セレクトボックス用
-                model.addAttribute("meals", meals);
-                model.addAttribute("totals", totals);
-                model.addAttribute("target", target);
-                model.addAttribute("pageTitle", "食事入力");
+        model.addAttribute("foods", FoodCatalog.ITEMS.keySet());
+        model.addAttribute("meals", meals);
+        model.addAttribute("totals", totals);
+        model.addAttribute("target", target);
+        model.addAttribute("pageTitle", "食事入力");
 
         return "diet/meal";
     }
 
-    @PostMapping
-    public String add(@SessionAttribute(value = "profileId", required = false) Long profileId, @ModelAttribute("mealForm") MealForm form) {
-        if(profileId == null) return "redirect:/diet/select";
 
+    @PostMapping
+    public String add(@SessionAttribute(value = "profileId", required = false) Long profileId,
+                    @ModelAttribute("mealForm") MealForm form) {
+        if (profileId == null) return "redirect:/diet/select";
         Profile p = profileRepo.findById(profileId).orElse(null);
-        if(p == null) return "redirect:/diet/select";
-        
+        if (p == null) return "redirect:/diet/select";
+
         mealService.addMeal(p, LocalDate.now(), form.getFoodName(), form.getGrams());
         return "redirect:/diet/meal";
     }
 
-    @PostMapping("/diet/meal/{mealId}/delete")
+
+    @PostMapping("/{mealId}/delete")
     public String deleteMeal(
             @PathVariable Long mealId,
             @SessionAttribute(value = "profileId", required = false) Long profileId,
             RedirectAttributes ra) {
 
-                if (profileId == null) {
-                    return "redirect:/diet/select";
-                }
+        if (profileId == null) return "redirect:/diet/select";
 
-                mealRepo.findByIdAndProfileId(mealId, profileId)
-                    .ifPresent(m -> mealRepo.deleteById(mealId));
+        mealRepo.findByIdAndProfileId(mealId, profileId)
+                .ifPresent(m -> mealRepo.deleteById(mealId));
 
-                ra.addFlashAttribute("msg", "食事を削除しました。");
-                return "redirect:/diet/meal";
+        ra.addFlashAttribute("msg", "食事を削除しました。");
+        return "redirect:/diet/meal";
     }
+
 
     @GetMapping("/diet/meal")
     public String mealList(@SessionAttribute(value = "profileId", required = false) Long profileId, Model model) {
