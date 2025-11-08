@@ -39,12 +39,6 @@
     <button type="submit">追加</button>
     </form>
 
-<!-- 削除ボタン（行ごと） -->
-    <form th:action="@{'/diet/meal/' + ${m.id} + '/delete'}" method="post">
-    <button type="submit" class="danger">削除</button>
-    </form>
-
-
   <!-- 今日の目標と進捗 -->
   <section th:if="${target != null}">
     <h3 style="margin-top:24px;">今日の食事</h3>
@@ -61,19 +55,27 @@
       </tr>
     </thead>
     <tbody>
-      <tr th:each="m : ${meals}">
+    <tr th:each="m : ${meals}">
         <td th:text="${m.foodName}">ごはん</td>
         <td class="right" th:text="${m.grams}">100</td>
         <td class="right" th:text="${m.energyKcal}">168</td>
         <td class="right" th:text="${m.proteinG}">3.0</td>
         <td class="right" th:text="${m.fatG}">0.3</td>
         <td class="right" th:text="${m.carbG}">37</td>
+
         <td class="right">
-      </tr>
-      <tr th:if="${#lists.isEmpty(meals)}">
+        <form th:action="@{/diet/meal/{mealId}/delete(mealId=${m.id})}" method="post">
+            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" class="btn-danger">削除</button>
+        </form>
+        </td>
+    </tr>
+
+    <tr th:if="${#lists.isEmpty(meals)}">
         <td colspan="7" class="muted">まだ登録がありません。</td>
-      </tr>
+    </tr>
     </tbody>
+
   </table>
 
     <h3 style="margin-top:16px;">今日の進捗</h3>
@@ -122,9 +124,6 @@
       </div>
     </div>
   </section>
-
-
-  
 
   <p style="margin-top:16px;"><a th:href="@{/diet/select}">← モード選択に戻る</a></p>
 </div>

@@ -25,13 +25,28 @@ public class Food {
     @Column(nullable = false, unique = true, length = 120)
     private String name;
 
-    @NotNull private Integer energyKcalPer100g;  // kcal
-    @NotNull private Double proteinGPer100g;     // g
-    @NotNull private Double fatGPer100g;         // g
-    @NotNull private Double carbGPer100g;        // g
-    @NotNull private Double fiberGPer100g;       // g
-    @NotNull private Double sodiumGPer100g;      // g（食塩相当量）
-    @NotNull private Double potassiumMgPer100g;  // mg
-    @NotNull private Double phosphorusMgPer100g; // mg
+    @NotNull @Column(name = "energy_kcal_per100g")
+    private Integer energyKcalPer100g;
+
+    @NotNull @Column(name = "protein_g_per100g")
+    private Double proteinGPer100g;
+
+    @NotNull @Column(name = "fat_g_per100g")
+    private Double fatGPer100g;
+
+    @NotNull @Column(name = "carb_g_per100g")
+    private Double carbGPer100g;
+
+    @NotNull @Column(name = "fiber_g_per100g")
+    private Double fiberGPer100g;
+
+    @NotNull @Column(name = "sodium_g_per100g")
+    private Double sodiumGPer100g;
+
+    @NotNull @Column(name = "potassium_mg_per100g")
+    private Double potassiumMgPer100g;
+
+    @NotNull @Column(name = "phosphorus_mg_per100g")
+    private Double phosphorusMgPer100g;
 
 }

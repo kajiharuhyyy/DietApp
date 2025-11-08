@@ -20,7 +20,6 @@ import com.example.demo.domain.Profile;
 import com.example.demo.repo.FoodRepository;
 import com.example.demo.repo.MealRepository;
 import com.example.demo.repo.ProfileRepository;
-import com.example.demo.service.FoodCatalog;
 import com.example.demo.service.MealService;
 import com.example.demo.service.TargetCalculator;
 import com.example.demo.service.MealService.Totals;
@@ -96,8 +95,8 @@ public class MealController {
     public static class MealForm {
         private Long foodId;
         private int grams = 100;
-
-public Long getFoodId() { return foodId; }
+        
+        public Long getFoodId() { return foodId; }
         public void setFoodId(Long id) { this.foodId = id; }
         public int getGrams() { return grams; }
         public void setGrams(int g) { this.grams = g; }
